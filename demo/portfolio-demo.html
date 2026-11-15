@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generic CRM — Demo de portafolio</title>
+<style>
+  :root{--bg:#0f1117;--card:#181b24;--line:#262b38;--tx:#e8eaf0;--mut:#8b93a7;--acc:#5b8cff;--ok:#3fb96a;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font:15px/1.6 system-ui,sans-serif;padding:32px 24px;max-width:1060px;margin:0 auto}
+  h1{font-size:26px} h2{font-size:19px;margin:40px 0 6px;color:var(--acc)}
+  .sub{color:var(--mut);font-size:14px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .chip{border:1px solid var(--line);border-radius:99px;padding:3px 12px;font-size:12px;color:var(--mut)}
+  .shot{width:100%;border:1px solid var(--line);border-radius:10px;margin:12px 0 4px;display:block}
+  figcaption{color:var(--mut);font-size:13px;margin-bottom:8px}
+  .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+  .num{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center}
+  .num b{display:block;font-size:24px}
+  .num span{color:var(--mut);font-size:12px}
+  pre{background:#0d0f14;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;font-size:13px;color:var(--ok)}
+  .note{background:var(--card);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:var(--mut);margin:10px 0}
+  footer{margin-top:48px;color:var(--mut);font-size:12px;border-top:1px solid var(--line);padding-top:16px}
+  ol.flow{padding-left:22px;color:var(--mut)} ol.flow li{margin:4px 0} ol.flow b{color:var(--tx)}
+</style>
+</head>
+<body>
+
+<h1>🏭 Generic CRM <span style="color:var(--mut);font-weight:400">— backoffice + asistente IA sobre tus datos</span></h1>
+<p class="sub">CRM autocontenido para portafolio: SPA React + API Node local + SQLite embebida que se crea y se pobla sola. Login sin contraseña (demo), seed data determinista, interfaz completa ES/EN y un agente de IA que responde preguntas sobre los datos reales con SQL de solo lectura.</p>
+<div class="chips">
+  <span class="chip">React 18 + Vite + Tailwind</span><span class="chip">Hono + Node</span><span class="chip">SQLite (better-sqlite3)</span><span class="chip">Zod en todos los bordes</span><span class="chip">React Query + React Table</span><span class="chip">Vitest · 237 tests</span><span class="chip">Playwright E2E</span><span class="chip">Agent tool-calling (OpenAI-compatible)</span>
+</div>
+
+<div class="nums">
+  <div class="num"><b>237</b><span>tests verdes</span></div>
+  <div class="num"><b>96%</b><span>coverage server</span></div>
+  <div class="num"><b>&lt;40ms</b><span>p95 listados @10k rows</span></div>
+  <div class="num"><b>&lt;1s</b><span>arranque frío + seed</span></div>
+  <div class="num"><b>0</b><span>deps de cloud · cero config</span></div>
+</div>
+
+<h2>1 · Login demo sin contraseña</h2>
+<figure><img class="shot" src="img/08-login.jpeg" alt="Login" loading="lazy"><figcaption>Se entra con cualquier nombre — la sesión vive en una cookie firmada y el nombre queda como actor de las trazas de auditoría. Sin credenciales: es una demo de portafolio.</figcaption></figure>
+
+<h2>2 · Dashboard de métricas</h2>
+<figure><img class="shot" src="img/03-dashboard.jpeg" alt="Dashboard" loading="lazy"><figcaption>Primera pantalla: valor del pipeline por etapa, tasa de éxito, negocios abiertos y actividades de las últimas 8 semanas — charts propios en CSS/SVG, sin librerías. Toda cifra es computable desde la vista de negocios (verificable: QA cross-checkeó 9/9 valores contra la base).</figcaption></figure>
+
+<h2>3 · Pipeline de negocios</h2>
+<figure><img class="shot" src="img/02-deals.jpeg" alt="Negocios" loading="lazy"><figcaption>Board agrupado por etapa con conteo y monto por grupo, botón de export CSV (RFC 4180, BOM, abre limpio en Excel) y búsqueda por título/empresa/responsable. Las etapas avanzan solo por transiciones válidas: nuevo → calificado → propuesta → ganado/perdido.</figcaption></figure>
+
+<h2>4 · Detalle con auditoría inmutable</h2>
+<figure><img class="shot" src="img/04-deal-detail.jpeg" alt="Detalle de negocio" loading="lazy"><figcaption>Cada negocio muestra dos historiales de solo lectura: <b>etapas</b> (quién movió y cuándo) y <b>montos</b> (de $24,000 a $32,000, por Alex). Los eventos se escriben en la misma transacción del cambio y no existe endpoint que pueda editarlos ni borrarlos.</figcaption></figure>
+
+<h2>5 · Búsqueda global</h2>
+<figure><img class="shot" src="img/05-search.jpeg" alt="Búsqueda global" loading="lazy"><figcaption>Un solo campo busca contactos, empresas y negocios a la vez; resultados agrupados con score de relevancia (el mismo ranking que usa el agente IA) que navegan al detalle.</figcaption></figure>
+
+<h2>6 · Ficha de empresa</h2>
+<figure><img class="shot" src="img/06-company.jpeg" alt="Detalle de empresa" loading="lazy"><figcaption>Vista de empresa con su contacto y sus negocios asociados — generada por la navegación desde la búsqueda global.</figcaption></figure>
+
+<h2>7 · Asistente IA sobre los datos (RAG híbrido)</h2>
+<figure><img class="shot" src="img/01-chat.jpeg" alt="Chat IA" loading="lazy"><figcaption>El agente traduce la pregunta a SQL de solo lectura contra la misma SQLite y responde con las cifras reales — y muestra la consulta exacta que corrió (transparencia anti-alucinación). Guardarrails por construcción: solo SELECT, límite de filas, timeout, rate limit. Funciona con cualquier endpoint OpenAI-compatible (OpenRouter, OpenAI, Groq, Ollama local); sin API key degrada honestamente explicando cómo activarlo.</figcaption></figure>
+
+<h2>8 · Interfaz bilingüe ES/EN</h2>
+<figure><img class="shot" src="img/07-dashboard-en.jpeg" alt="Dashboard en inglés" loading="lazy"><figcaption>Toggle de idioma en toda la UI (incluye etapas, fechas y el propio asistente). Sin mezcla de idiomas en ninguna vista — i18n propio, sin dependencias.</figcaption></figure>
+
+<h2>Cómo correrlo</h2>
+<pre>git clone &lt;repo&gt; &amp;&amp; cd generic-crm
+npm install
+npm run dev          # → http://localhost:5173  (la base se crea y se pobla sola)</pre>
+<p class="sub">Extras: <code>npm run reset</code> (re-seed determinista) · <code>npm run seed:volume &amp;&amp; npm run bench</code> (10k filas + p95) · <code>npm run smoke</code> (E2E Playwright) · chat IA: copiar <code>.env.example</code> a <code>.env</code> y poner una key de OpenRouter gratis.</p>
+
+<h2>Guion de demo (3 minutos)</h2>
+<ol class="flow">
+  <li><b>Entrar</b> — escribir cualquier nombre, sin contraseña (15s).</li>
+  <li><b>Dashboard</b> — "toda la foto del negocio en una pantalla" (30s).</li>
+  <li><b>Negocios</b> — board por etapa + export CSV descargable (30s).</li>
+  <li><b>Abrir un negocio</b> — historiales de etapa y monto, mover de etapa inválida imposible (45s).</li>
+  <li><b>Búsqueda global</b> — "brigh" → empresa, contacto y deals (20s).</li>
+  <li><b>Chat IA</b> — "¿cuántos negocios hay en propuesta?" → respuesta + SQL visible; toggle a EN y repetir (60s).</li>
+</ol>
+
+<div class="note"><b>Ingeniería detrás:</b> 237 tests (unit + integración con SQLite real + E2E), 4 rondas de QA adversarial (0 críticos/mayores abiertos), migraciones SQL numeradas, seed determinista byte a byte, validación Zod en todos los bordes, rate limit, soft delete, inmutabilidad de auditoría probada por ausencia de rutas. NFRs medidos: p95 &lt;40ms con 10k filas, arranque frío &lt;1s, export de 10.000 filas en 112ms.</div>
+
+<footer>Generic CRM — proyecto de portafolio · stack: React 18 / Hono / SQLite / Vitest / Playwright · sin servicios externos obligatorios · capturas reales de la app corriendo (2026-11-15)</footer>
+
+</body>
+</html>

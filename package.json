@@ -1,0 +1,33 @@
+{
+  "name": "generic-crm",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "admin",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,spa -c blue,green \"npm run dev --workspace server\" \"npm run dev --workspace admin\"",
+    "test": "npm test --workspace server && npm test --workspace admin",
+    "build": "npm run build --workspace admin && npm run build --workspace server",
+    "reset": "npm run reset --workspace server",
+    "seed:volume": "npm run seed:volume --workspace server",
+    "bench": "npm run bench --workspace server",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "autocannon": "^8.0.0",
+    "concurrently": "^9.1.0",
+    "vite": "^6.4.6",
+    "vitest": "^5.1.0"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true,
+    "esbuild@0.28.2": true,
+    "esbuild@0.25.12": true
+  }
+}
