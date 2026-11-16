@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+**/dist
+db/data
+.env
+.git
+.gitignore
+brain
+factory
+demo
+e2e
+test-results
+coverage
+playwright-report
+AGENTS.md
+docker-compose.yml
+.dockerignore

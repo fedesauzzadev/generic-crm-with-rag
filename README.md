@@ -93,6 +93,19 @@ npm test          # 237 unit/API tests
 npm run smoke     # E2E Playwright (after: npx playwright install chromium)
 ```
 
+## Docker
+
+The whole app also runs as a single container (SPA + API + SQLite in one image):
+
+```bash
+docker compose up --build     # → http://localhost:8787
+docker compose down           # stop (add -v to also wipe the demo data volume)
+```
+
+- The container builds the SPA, serves it from the API itself (`public/`) and exposes a single port.
+- The SQLite file lives in a named volume (`crm-data`), so the demo data survives restarts; on the very first start the database is created, migrated and seeded automatically.
+- Your `.env` (if present) is picked up by compose, so the AI assistant works inside the container with the same `CRM_LLM_*` variables; without a key it degrades honestly.
+
 ## Project layout
 
 ```

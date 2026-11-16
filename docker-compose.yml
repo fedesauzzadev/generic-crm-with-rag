@@ -1,0 +1,21 @@
+services:
+  crm:
+    build: .
+    ports:
+      - "8787:8787"
+    environment:
+      # Interpola del .env local si existe (compose lo lee); sin key el chat degrada honesto.
+      CRM_LLM_API_KEY: ${CRM_LLM_API_KEY:-}
+      CRM_LLM_BASE_URL: ${CRM_LLM_BASE_URL:-}
+      CRM_LLM_MODEL: ${CRM_LLM_MODEL:-}
+    volumes:
+      - crm-data:/app/db/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8787/api/ping').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  crm-data:
