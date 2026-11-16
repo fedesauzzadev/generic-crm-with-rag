@@ -106,14 +106,68 @@ docker compose down           # stop (add -v to also wipe the demo data volume)
 - The SQLite file lives in a named volume (`crm-data`), so the demo data survives restarts; on the very first start the database is created, migrated and seeded automatically.
 - Your `.env` (if present) is picked up by compose, so the AI assistant works inside the container with the same `CRM_LLM_*` variables; without a key it degrades honestly.
 
-## Project layout
+## Architecture
+
+Three pieces, one command. In dev, Vite proxies `/api`; in production/Docker the API serves the compiled SPA itself — one port.
 
 ```
-admin/            SPA (React 18 + Vite + Tailwind + React Query + React Router)
-server/           API (Hono on Node, zod validation, better-sqlite3)
-db/migrations/    Numbered SQL migrations (applied automatically on start)
-db/data/          SQLite file (created on first run, gitignored)
+┌────────────────────────── npm run dev ──────────────────────────┐
+│                                                                  │
+│  admin/ (React SPA)          server/ (Hono API on Node)         │
+│  ┌──────────────────┐  /api  ┌──────────────────────┐           │
+│  │ Vite :5173 ───────┼───────►│ zod → routes → SQLite├─► db/data/crm.db
+│  │ React Query      │  proxy │ better-sqlite3       │  (WAL, numbered
+│  └──────────────────┘        └──────────────────────┘   migrations, seed)
+└──────────────────────────────────────────────────────────────────┘
 ```
+
+**Golden rule:** the SPA never touches the database — every request goes through the API with Zod validation at the boundary.
+
+### Composition
+
+```
+├── admin/src/
+│   ├── app/        server state: React Query hooks (crm, session,
+│   │               chat), i18n provider, debounce
+│   ├── domain/     PURE logic, no React: stage definitions + ES/EN
+│   │               labels, date/money formatting, chat parsing,
+│   │               search ranking — everything unit-testable lives here
+│   └── ui/         reusable components (DataTable, Modal, StageBadge,
+│                   GlobalSearch, Layout) + one page per route
+├── server/src/
+│   ├── index.ts    bootstrap: load .env → open/migrate/seed DB →
+│   │               mount API (+ SPA if public/ exists) → listen
+│   ├── db.ts       findRepoRoot (walks up to db/migrations), WAL
+│   ├── db/         migrate (numbered SQL), deterministic seed,
+│   │               volume seed (10k), reset
+│   ├── domain/     pipeline (stage transitions + guards), CSV
+│   │               serializer (RFC 4180), search ranking (shared
+│   │               with the AI agent)
+│   ├── routes/     one factory per entity: createContactsRoutes(db) —
+│   │               the DB is injected, so tests pass their own
+│   ├── chat/       the RAG agent: route (contract), agent loop
+│   │               (≤4 LLM calls), llm adapter (plain fetch,
+│   │               OpenAI-compatible), tools (read-only sql_query +
+│   │               search_records), schema (runtime DDL from
+│   │               sqlite_master), bilingual system prompt
+│   └── auth.ts     signed HttpOnly cookie + session middleware
+│                   (the demo user becomes the audit-trail actor)
+├── db/migrations/  0001 init · 0002 index · 0003 amount audit trail
+├── e2e/ scripts/   self-contained Playwright smoke
+└── demo/           portfolio page with real screenshots
+```
+
+### The five patterns that define this codebase
+
+1. **Route factories with injected DB** — `createDealsRoutes(db)` receives the database; tests spin up a real temp SQLite and exercise the API end to end (no DB mocks). That's what makes 96% server coverage honest.
+2. **Pure domain at the sides** — logic with no I/O (stages, formatting, ranking, CSV) lives in flat, fully-tested `domain/` modules; routes and components only orchestrate.
+3. **Validation at the boundary, trust inside** — Zod validates every request; inner code assumes clean types. The AI agent gets the same treatment: its SQL passes a dedicated guard (SELECT-only, forced LIMIT, read-only connection) before touching a separate database handle.
+4. **Transactional audit trails** — a stage or amount change writes its audit event in the *same transaction* as the update: all or nothing. Immutable by absence of routes.
+5. **One source of truth per concept** — one i18n dictionary, one CSV serializer, one search ranking, one pipeline definition per layer. When something did get duplicated (the ranking, found in review), it was extracted — measured with jscpd: **3.38% duplication, all structural** (sibling CRUD list patterns and two minimal detail pages), far below the ~10% concern threshold.
+
+### One-liner for interviews
+
+> "Two-workspace monorepo: React SPA with app/domain/ui layers and a Hono API of route factories that inject the SQLite handle; Zod at every boundary, pure unit-tested domain, transactional audit trails, and a read-only tool-calling RAG agent — 241 tests, Playwright E2E and Docker with a persistent volume."
 
 ## Glossary (plain language)
 
