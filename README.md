@@ -165,10 +165,6 @@ Three pieces, one command. In dev, Vite proxies `/api`; in production/Docker the
 4. **Transactional audit trails** — a stage or amount change writes its audit event in the *same transaction* as the update: all or nothing. Immutable by absence of routes.
 5. **One source of truth per concept** — one i18n dictionary, one CSV serializer, one search ranking, one pipeline definition per layer. When something did get duplicated (the ranking, found in review), it was extracted — measured with jscpd: **3.38% duplication, all structural** (sibling CRUD list patterns and two minimal detail pages), far below the ~10% concern threshold.
 
-### One-liner for interviews
-
-> "Two-workspace monorepo: React SPA with app/domain/ui layers and a Hono API of route factories that inject the SQLite handle; Zod at every boundary, pure unit-tested domain, transactional audit trails, and a read-only tool-calling RAG agent — 241 tests, Playwright E2E and Docker with a persistent volume."
-
 ## Glossary (plain language)
 
 - **Contact** — a person you sell to: name, email, phone, job title.
